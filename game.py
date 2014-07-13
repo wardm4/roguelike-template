@@ -1,11 +1,13 @@
 import pygcurse, pygame, sys, time, random
 from pygame.locals import *
 
+#Main Window size and name
 win = pygcurse.PygcurseWindow(60, 30)
 pygame.display.set_caption('Pygcurse Test')
-
 win.autowindowupdate = False
 win.autoupdate = False
+
+#A rudimentary class that stores the character's position and health
 
 class Character(object):
     def __init__(self, posx, posy):
@@ -19,15 +21,39 @@ class Character(object):
         else:
             opponent.health -= 1
 
+
+#Some simple auxilary functions
+
+def testposition(x,y):
+    return x >= 10 and x < 60 and y >= 5 and y < 30
+
+def randx():
+    return random.randint(11,59)
+
+def randy(): 
+    return random.randint(6, 29)
+
+
+#Start the main pygame function
+
 def main():
+
+    #Initialize some values
+
     moveUp = moveDown = moveLeft = moveRight = False
-    hero = Character(15, 10)
-    enemy = Character(20, 20)
+    hero = Character(randx(), randy())
+    enemy = Character(randx(), randy())
+
+    #Start the game loop
+
     while True:
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
+
+
+            #Get input with standard vi keybinding or arrow keys
 
             elif event.type == KEYDOWN:
                 if event.key == K_BACKSPACE:
@@ -37,40 +63,55 @@ def main():
                     sys.exit()
                 elif event.key == K_UP or event.key == K_k:
                     moveUp = True
-                elif event.key == K_DOWN:
+                elif event.key == K_DOWN or event.key == K_j:
                     moveDown = True
-                elif event.key == K_LEFT:
+                elif event.key == K_LEFT or event.key == K_h:
                     moveLeft = True
-                elif event.key == K_RIGHT:
+                elif event.key == K_RIGHT or event.key == K_l:
                     moveRight = True
+                elif event.key == K_u:
+                    moveRight = True
+                    moveUp = True
+                elif event.key == K_y:
+                    moveLeft = True
+                    moveUp = True
+                elif event.key == K_n:
+                    moveRight = True
+                    moveDown = True
+                elif event.key == K_b:
+                    moveLeft = True
+                    moveDown = True
               
             
 
         # move the player (if allowed)
         
-        if moveUp and (hero.posx, hero.posy) != (20,21):
+        if moveUp and (hero.posx, hero.posy) != (enemy.posx,enemy.posy+1) and testposition(hero.posx, hero.posy-1):
             hero.posy -= 1
-        elif moveDown and (hero.posx, hero.posy) != (20,19):
+        if moveDown and (hero.posx, hero.posy) != (enemy.posx,enemy.posy-1) and testposition(hero.posx, hero.posy+1):
             hero.posy += 1
-        elif moveLeft and (hero.posx, hero.posy) != (21,20):
+        if moveLeft and (hero.posx, hero.posy) != (enemy.posx+1,enemy.posy) and testposition(hero.posx-1, hero.posy):
             hero.posx -= 1
-        elif moveRight and (hero.posx, hero.posy) != (19,20):
+        if moveRight and (hero.posx, hero.posy) != (enemy.posx-1,enemy.posy) and testposition(hero.posx+1, hero.posy):
             hero.posx += 1
 
-    
-        if moveUp and (hero.posx, hero.posy) == (20,21):
+        #A very basic 50/50 attack system
+
+        if moveUp and (hero.posx, hero.posy) == (enemy.posx,enemy.posy+1):
             hero.attack(enemy)
-        elif moveDown and (hero.posx, hero.posy) == (20,19):
+        elif moveDown and (hero.posx, hero.posy) == (enemy.posx,enemy.posy-1):
             hero.attack(enemy)
-        elif moveLeft and (hero.posx, hero.posy) == (21,20):
+        elif moveLeft and (hero.posx, hero.posy) == (enemy.posx+1,enemy.posy):
             hero.attack(enemy)
-        elif moveRight and (hero.posx, hero.posy) == (19,20):
+        elif moveRight and (hero.posx, hero.posy) == (enemy.posx-1,enemy.posy):
             hero.attack(enemy)
 
         moveUp = moveDown = moveLeft = moveRight = False
 
 
-        # display
+        # Display the "dungeon" and character info, playing with these colors
+        # will certainly result in something more pleasing to the eye.
+
         win.fill('.', region = (10, 5, 50, 25), fgcolor='silver', bgcolor='olive')
         win.putchar('@', hero.posx, hero.posy)
         win.putchar('v', enemy.posx, enemy.posy)
@@ -80,6 +121,7 @@ def main():
         win.update()
         pygame.display.update()
         
+        #Test for the end of the game and break out if over
 
         if hero.health == 0:
             break
@@ -87,7 +129,7 @@ def main():
         if enemy.health == 0:
             break
 
-        
+    #Display whether you won or lost    
         
     if hero.health == 0:
         win.write('You lose.', 10, 2, fgcolor='white')
