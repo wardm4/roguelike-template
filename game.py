@@ -46,41 +46,42 @@ def main():
 
     #Start the game loop
 
+    t = 0
     while True:
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                pygame.quit()
-                sys.exit()
 
+        pygame.event.set_allowed(None)
+        pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN])
+        e = pygame.event.wait()
+        pressed = e.key
 
-            #Get input with standard vi keybinding or arrow keys
+    
+        #Get input with standard vi keybinding or arrow keys
 
-            elif event.type == KEYDOWN:
-                if event.key == K_BACKSPACE:
-                    newGame = True
-                elif event.key == K_ESCAPE:
-                    pygame.quit()
-                    sys.exit()
-                elif event.key == K_UP or event.key == K_k:
-                    moveUp = True
-                elif event.key == K_DOWN or event.key == K_j:
-                    moveDown = True
-                elif event.key == K_LEFT or event.key == K_h:
-                    moveLeft = True
-                elif event.key == K_RIGHT or event.key == K_l:
-                    moveRight = True
-                elif event.key == K_u:
-                    moveRight = True
-                    moveUp = True
-                elif event.key == K_y:
-                    moveLeft = True
-                    moveUp = True
-                elif event.key == K_n:
-                    moveRight = True
-                    moveDown = True
-                elif event.key == K_b:
-                    moveLeft = True
-                    moveDown = True
+        if pressed == 8:
+            newGame = True
+        elif pressed == 27:
+            pygame.quit()
+            sys.exit()
+        elif pressed == 273 or pressed == 107:
+            moveUp = True
+        elif pressed == 274 or pressed == 106:
+            moveDown = True
+        elif pressed == 276 or pressed == 104:
+            moveLeft = True
+        elif pressed == 275 or pressed == 108:
+            moveRight = True
+        elif pressed == 117:
+            moveRight = True
+            moveUp = True
+        elif pressed == 121:
+            moveLeft = True
+            moveUp = True
+        elif pressed == 110:
+            moveRight = True
+            moveDown = True
+        elif pressed == 98:
+            moveLeft = True
+            moveDown = True
               
             
 
@@ -107,6 +108,7 @@ def main():
             hero.attack(enemy)
 
         moveUp = moveDown = moveLeft = moveRight = False
+        t += 1
 
 
         # Display the "dungeon" and character info, playing with these colors
@@ -117,7 +119,8 @@ def main():
         win.putchar('v', enemy.posx, enemy.posy)
         win.write('Your health: ' + str(hero.health), 10, 0, fgcolor='white')
         win.write('Virus health: ' + str(enemy.health), 10, 1, fgcolor='white')
-        win.write('Items:', 0, 5, fgcolor='white')
+        win.write('Turn: ' + str(t), 0, 5, fgcolor='white')
+        win.write('Items:', 0, 6, fgcolor='white')
         win.update()
         pygame.display.update()
         
